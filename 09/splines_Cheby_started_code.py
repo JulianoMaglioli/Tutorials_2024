@@ -4,34 +4,45 @@ import matplotlib.pyplot as plt
 
 def f(x):                      # Test function
     return np.arctan(5.0*x)
+# Domain
+left = -2
+right = 2
 
+#Grid for plotting
 Nplot = 1000
 xs = np.linspace(-2,2,Nplot) # Grid for plotting
 
-N0 = 
-N1 = 
-Ntest = 
+N0 = 2
+N1 = 7
+Ntest = N1 - N0 + 1
 errs = np.zeros((Ntest,3))
 
 # Spline interpolation:
 for n in range(N0,N1+1):
     N = 2**n                                                      # Fix nr. of knots.
-    x =                                                           # The locations of the knots.
-    y =                                                           # The y-values at the knots.
-    S = intp.CubicSpline( ... )                                   # Using the spline function from SciPy.interpolate.
-    ys = S.__call__(xs)                                           # This SciPy function returns a PPoly object, this is how to evaluate the interpolant.
-    plt.plot(xs,f(xs),'-k',label='f(x)')
-    plt.plot(xs,ys,'-r',label='cubic spline on '+str(N)+' knots') # Plot with legend.
+    
+    x_interpolate = np.linspace(left, right, n)                   # The locations of the knots. Equivalent Nodes.
+    y_interpolate = f(x_interpolate)                              # The y-values at the knots.
+    
+    # want to interpolate using scipy interpolate library
+   
+    Function_cubic = intp.CubicSpline(x_interpolate,y_interpolate,bc_type = 'natural')    # Using the spline function from SciPy.interpolate.
+    
+    y_plot_interpolate = Function_cubic.__call__(x_plot)                                                      # This SciPy function returns a PPoly object, this is how to evaluate the interpolant.
+
+    #Plot function and interpolant
+    plt.plot(x_plot, y_plot,'-k',label='f(x)')
+    plt.plot(x_plot,y_plot_interpolate,'-r',label='cubic spline on '+str(N)+' knots') # Plot with legend.
     plt.ylim([-2,2])
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend()
     plt.show()
-    e = abs( ... )                                                 # Estimate the error on the fine grid.
+    e = abs(y_plot-y_plot_interpolate)                                                 # Estimate the error on the fine grid.
     plt.title('|f(x)-S_N(x)| for N='+str(N))
     plt.xlabel('x')
     plt.ylabel('error')
-    plt.plot(xs,e,'-r')
+    plt.plot(x_plot,e,'-r')
     plt.show()
     errs[n-N0,0] = float(N)                                        # Remember the error to compare the methods.
     errs[n-N0,1] = np.max(e)
@@ -40,14 +51,21 @@ for n in range(N0,N1+1):
 
 for n in range(N0,N1+1):
     N = 2**n
+   
     x = 2.0*np.cos(np.linspace(0,N,N+1) * np.pi/float(N))           # Set the interpolation nodes.
-    y =                                                             # Compute the corresponding y-values.
-    ys =                                                            # Use an in-built function or our own..
-    plt.plot(xs,f(xs),'-k',xs,ys,'-r')
+    
+    
+    y_interpolate = f(x_interpolate)                                                           # Compute the corresponding y-values.
+    ys =  intp.barycentric_interpolate(x_interpolate,y_interpolate,x_plot)                                                          # Use an in-built function or our own..
+
+    # Plot Function and Interpolant
+    plt.plot(x_plot,y_plot,'-k',x_plot_interpolate,y_plot_interpolate,'-r')
     plt.ylim([-2,2])
     plt.show()
-    e = abs(f(xs)-ys)
-    plt.plot(xs,e,'-r')
+    
+    
+    e = abs(y_plot-y_plot_interpolate)
+    plt.plot(x_plot,e,'-r')
     plt.show()
     errs[n-N0,2] = np.max(e)
 
